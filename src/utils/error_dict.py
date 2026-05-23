@@ -1,4 +1,4 @@
-from src.schemas.base import ErrorResponse
+from src.api.v1.schemas.base import ErrorResponse
 
 error_dict_400_404_409_422_500: dict = {
     400: {"model": ErrorResponse},

@@ -1,10 +1,17 @@
 from decimal import Decimal
+from enum import Enum
 from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from src.api.v1.schemas.base import BaseResponse
+
+
+class OperationType(str, Enum):
+    """Type of wallet operation."""
+    DEPOSIT = "DEPOSIT"
+    WITHDRAW = "WITHDRAW"
 
 
 class WalletBalanceResponse(BaseResponse):
@@ -34,7 +41,7 @@ class WalletBalanceResponse(BaseResponse):
 class WalletOperationRequest(BaseModel):
     """Input model for wallet operation endpoint."""
 
-    operation_type:  Literal["DEPOSIT", "WITHDRAW"] = Field(
+    operation_type: OperationType = Field(
         ...,
         title="Type of operation",
         description="Operation of deposit or withdraw on wallet"
@@ -56,7 +63,7 @@ class WalletOperationResponse(BaseResponse):
         title="Operation success status",
         description="Always true for successful request",
     )
-    operation_type:  Literal["DEPOSIT", "WITHDRAW"] = Field(
+    operation_type:  OperationType = Field(
         ...,
         title="Type of operation",
         description="Operation of deposit or withdraw on wallet"

@@ -3,9 +3,7 @@ from enum import Enum
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
-
-from src.api.v1.schemas.base import BaseResponse
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class OperationType(str, Enum):
@@ -14,14 +12,9 @@ class OperationType(str, Enum):
     WITHDRAW = "WITHDRAW"
 
 
-class WalletBalanceResponse(BaseResponse):
+class WalletBalanceResponse(BaseModel):
     """Response model for wallet balance endpoint."""
 
-    result: Literal[True] = Field(
-        default=True,
-        title="Operation success status",
-        description="Always true for successful balance retrieval",
-    )
     uuid: UUID = Field(
         ...,
         title="Wallet UUID",
@@ -36,6 +29,8 @@ class WalletBalanceResponse(BaseResponse):
         description="Current wallet balance, non-negative decimal with 2 decimal places",
         examples=[1500.00],
     )
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class WalletOperationRequest(BaseModel):
@@ -55,14 +50,9 @@ class WalletOperationRequest(BaseModel):
     )
 
 
-class WalletOperationResponse(BaseResponse):
+class WalletOperationResponse(BaseModel):
     """Output model for wallet operation endpoint."""
 
-    result: Literal[True] = Field(
-        default=True,
-        title="Operation success status",
-        description="Always true for successful request",
-    )
     operation_type:  OperationType = Field(
         ...,
         title="Type of operation",
@@ -89,3 +79,5 @@ class WalletOperationResponse(BaseResponse):
         description="Current wallet balance after transaction, non-negative decimal with 2 decimal places",
         examples=[1500.00],
     )
+
+    model_config = ConfigDict(from_attributes=True)

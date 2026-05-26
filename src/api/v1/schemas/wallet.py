@@ -70,7 +70,7 @@ class WalletOperationResponse(BaseModel):
         description="""
         Amount to be transferred to the wallet, must be a non-negative integer
         """,
-        examples=[100.00]
+        examples=[100.00],
     )
     uuid: UUID = Field(
         ...,

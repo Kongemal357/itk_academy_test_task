@@ -1,14 +1,13 @@
 import asyncio
-import pytest
 import uuid
-
-from httpx import AsyncClient
 from decimal import Decimal
 
+import pytest
+from httpx import AsyncClient
 from sqlalchemy import select
 
-from src.db.models import Wallet
 from src.api.v1.schemas.wallet import OperationType
+from src.db.models import Wallet
 
 
 @pytest.mark.integration
@@ -20,15 +19,11 @@ async def test_withdraw_race_condition_prevented(integration_client, db_session)
 
     async def withdraw_600():
         async with AsyncClient(
-            transport=integration_client._transport,
-            base_url="http://test"
+            transport=integration_client._transport, base_url="http://test"
         ) as client:
             return await client.post(
                 f"/api/v1/wallets/{wallet_uuid}/operation",
-                json={
-                    "operation_type": OperationType.WITHDRAW,
-                    "amount": "600"
-                }
+                json={"operation_type": OperationType.WITHDRAW, "amount": "600"},
             )
 
     r1, r2 = await asyncio.gather(withdraw_600(), withdraw_600())
@@ -49,15 +44,11 @@ async def test_concurrent_deposits(integration_client, db_session):
 
     async def deposit_100():
         async with AsyncClient(
-            transport=integration_client._transport,
-            base_url="http://test"
+            transport=integration_client._transport, base_url="http://test"
         ) as client:
             return await client.post(
                 f"/api/v1/wallets/{wallet_uuid}/operation",
-                json={
-                    "operation_type": OperationType.DEPOSIT,
-                    "amount": "100"
-                }
+                json={"operation_type": OperationType.DEPOSIT, "amount": "100"},
             )
 
     tasks = [deposit_100() for _ in range(10)]
@@ -82,18 +73,17 @@ async def test_concurrent_blocked_row(integration_client, db_session, engine):
             result = await conn.execute(
                 select(Wallet).where(Wallet.uuid == wallet_uuid).with_for_update()
             )
-            blocked_wallet = result.scalar_one()
+            result.scalar_one()
 
             async with AsyncClient(
-                transport=integration_client._transport,
-                base_url="http://test"
+                transport=integration_client._transport, base_url="http://test"
             ) as client:
                 # Без nowait — запрос подвиснет
                 # Сервер будет ждать 10 сек (command_timeout), потом упадёт с 50
                 response = await client.post(
                     f"/api/v1/wallets/{wallet_uuid}/operation",
                     json={"operation_type": "DEPOSIT", "amount": "500"},
-                    timeout=15  # ждём дольше, чем command_timeout
+                    timeout=15,  # ждём дольше, чем command_timeout
                 )
 
             assert response.status_code == 408

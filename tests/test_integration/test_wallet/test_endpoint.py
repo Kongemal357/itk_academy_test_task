@@ -1,10 +1,10 @@
-import pytest
 import uuid
-
 from decimal import Decimal
 
-from src.db.models import Wallet
+import pytest
+
 from src.api.v1.schemas.wallet import OperationType
+from src.db.models import Wallet
 
 
 @pytest.mark.integration
@@ -18,10 +18,7 @@ async def test_deposit_valid(integration_client, db_session):
 
     response = await integration_client.post(
         f"/api/v1/wallets/{wallet_uuid}/operation",
-        json={
-            "operation_type": OperationType.DEPOSIT,
-            "amount": str(deposit_value)
-        }
+        json={"operation_type": OperationType.DEPOSIT, "amount": str(deposit_value)},
     )
 
     assert response.status_code == 200
@@ -41,10 +38,7 @@ async def test_withdraw_valid(integration_client, db_session):
 
     response = await integration_client.post(
         f"/api/v1/wallets/{wallet_uuid}/operation",
-        json={
-            "operation_type": OperationType.WITHDRAW,
-            "amount": str(withdraw_value)
-        }
+        json={"operation_type": OperationType.WITHDRAW, "amount": str(withdraw_value)},
     )
 
     assert response.status_code == 200

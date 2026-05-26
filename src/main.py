@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+
 from src.api.v1 import api_v1_router
 from src.api.v1.errors import add_exception_handlers
-from src.db import models
-from src.db.database import close_engine, engine
+from src.db.database import close_engine
 from src.utils.logger import LoggingMiddleware
 
 

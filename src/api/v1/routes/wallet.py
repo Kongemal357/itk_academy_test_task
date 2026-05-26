@@ -1,16 +1,19 @@
 import asyncio
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Path, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from src.api.v1.schemas.wallet import WalletBalanceResponse, WalletOperationResponse, \
-    WalletOperationRequest, OperationType
-from src.db.database import get_session
+from src.api.v1.schemas.wallet import (
+    OperationType,
+    WalletBalanceResponse,
+    WalletOperationRequest,
+    WalletOperationResponse,
+)
 from src.db.crud import get_wallet_by_uuid, select_wallet_for_update_by_uuid
+from src.db.database import get_session
 from src.utils.error_dict import error_dict_400_404_409_422_500
-
 
 router = APIRouter(prefix="/wallets")
 
@@ -26,39 +29,39 @@ router = APIRouter(prefix="/wallets")
     """,
 )
 async def get_balance(
-        wallet_uuid: UUID = Path(
+    wallet_uuid: UUID = Path(
         ...,
         title="Wallet UUID",
         description="""
             The UUID of the wallet to retrieve balance for.
             Must be a valid UUID v4 format.
             """,
-        ),
-        session: AsyncSession = Depends(get_session),
+    ),
+    session: AsyncSession = Depends(get_session),
 ):
     """Retrieves the current balance information for a specific wallet.
 
-        Fetches the wallet's UUID and current balance based on the provided
-        wallet UUID.
+    Fetches the wallet's UUID and current balance based on the provided
+    wallet UUID.
 
-        :param wallet_uuid: UUID of the wallet to retrieve balance for.
-        :type wallet_uuid: UUID
-        :param session: Database session dependency for executing queries.
-        :type session: AsyncSession
+    :param wallet_uuid: UUID of the wallet to retrieve balance for.
+    :type wallet_uuid: UUID
+    :param session: Database session dependency for executing queries.
+    :type session: AsyncSession
 
-        :return: Response containing the wallet UUID and current balance.
-        :rtype: WalletBalanceResponse
+    :return: Response containing the wallet UUID and current balance.
+    :rtype: WalletBalanceResponse
 
-        :raises HTTPException 404: If the wallet specified by wallet_uuid is not found
-        in the database.
-        :raises HTTPException 500: If a database error occurs during query execution.
+    :raises HTTPException 404: If the wallet specified by wallet_uuid is not found
+    in the database.
+    :raises HTTPException 500: If a database error occurs during query execution.
 
-        .. note::
-            This endpoint does not require authentication.
+    .. note::
+        This endpoint does not require authentication.
 
-        .. warning::
-            The wallet must exist in the database, otherwise a 404 error will be returned.
-        """
+    .. warning::
+        The wallet must exist in the database, otherwise a 404 error will be returned.
+    """
     try:
         wallet = await get_wallet_by_uuid(wallet_uuid=wallet_uuid, session=session)
         if not wallet:
@@ -89,16 +92,16 @@ async def get_balance(
     """,
 )
 async def post_wallet_transaction(
-        transaction: WalletOperationRequest,
-        wallet_uuid: UUID = Path(
-            ...,
-            title="Wallet UUID",
-            description="""
+    transaction: WalletOperationRequest,
+    wallet_uuid: UUID = Path(
+        ...,
+        title="Wallet UUID",
+        description="""
                 UUID of the wallet to be used for the transaction.
                 Must be a valid UUID v4 format.
                 """,
-        ),
-        session: AsyncSession = Depends(get_session),
+    ),
+    session: AsyncSession = Depends(get_session),
 ):
     """Processes a deposit or withdrawal transaction on a specific wallet.
 
@@ -137,7 +140,9 @@ async def post_wallet_transaction(
         will be returned. Withdrawal operations require sufficient funds.
     """
     try:
-        wallet = await select_wallet_for_update_by_uuid(wallet_uuid=wallet_uuid, session=session)
+        wallet = await select_wallet_for_update_by_uuid(
+            wallet_uuid=wallet_uuid, session=session
+        )
         if not wallet:
             raise HTTPException(status_code=404, detail="Non-existent wallet uuid")
 
@@ -146,10 +151,7 @@ async def post_wallet_transaction(
 
         elif transaction.operation_type == OperationType.WITHDRAW:
             if wallet.balance < transaction.amount:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Insufficient funds"
-                )
+                raise HTTPException(status_code=400, detail="Insufficient funds")
             else:
                 new_balance = wallet.balance - transaction.amount
 

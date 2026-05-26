@@ -1,8 +1,8 @@
 import asyncio
 import os
-from unittest.mock import AsyncMock, MagicMock
-from decimal import Decimal
 import uuid
+from decimal import Decimal
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -15,6 +15,7 @@ from src.main import app
 DATABASE_URL_TEST = os.getenv("DATABASE_URL_TEST")
 
 # ==================== INTEGRATION DB ====================
+
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -56,6 +57,7 @@ async def db_session(engine):
 
 
 # ==================== UNIT DB ====================
+
 
 @pytest.fixture
 def mock_session():
@@ -101,7 +103,7 @@ async def integration_client(engine):
     app.dependency_overrides[get_session] = override_get_session
 
     async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test", timeout=30.0
+        transport=ASGITransport(app=app), base_url="http://test", timeout=30.0
     ) as client:
         yield client
 
@@ -111,8 +113,10 @@ async def integration_client(engine):
 @pytest.fixture
 async def unit_client(mock_session):
     """Client with mocked DB."""
+
     async def override_get_session():
         yield mock_session
+
     app.dependency_overrides[get_session] = override_get_session
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"

@@ -1,13 +1,13 @@
 from decimal import Decimal
 from enum import Enum
-from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class OperationType(str, Enum):
     """Type of wallet operation."""
+
     DEPOSIT = "DEPOSIT"
     WITHDRAW = "WITHDRAW"
 
@@ -26,7 +26,9 @@ class WalletBalanceResponse(BaseModel):
         ge=0,
         decimal_places=2,
         title="Wallet balance",
-        description="Current wallet balance, non-negative decimal with 2 decimal places",
+        description="""
+        Current wallet balance, non-negative decimal with 2 decimal places
+        """,
         examples=[1500.00],
     )
 
@@ -39,31 +41,36 @@ class WalletOperationRequest(BaseModel):
     operation_type: OperationType = Field(
         ...,
         title="Type of operation",
-        description="Operation of deposit or withdraw on wallet"
+        description="Operation of deposit or withdraw on wallet",
     )
     amount: Decimal = Field(
         ...,
         gt=0,
         decimal_places=2,
         title="Transaction amount",
-        description="Amount to be transferred to the wallet, must be a non-negative integer",
+        description="""
+        Amount to be transferred to the wallet, must be a non-negative integer
+        """,
     )
 
 
 class WalletOperationResponse(BaseModel):
     """Output model for wallet operation endpoint."""
 
-    operation_type:  OperationType = Field(
+    operation_type: OperationType = Field(
         ...,
         title="Type of operation",
-        description="Operation of deposit or withdraw on wallet"
+        description="Operation of deposit or withdraw on wallet",
     )
     amount: Decimal = Field(
         ...,
         gt=0,
         decimal_places=2,
         title="Transaction amount",
-        description="Amount to be transferred to the wallet, must be a non-negative integer",
+        description="""
+        Amount to be transferred to the wallet, must be a non-negative integer
+        """,
+        examples=[100.00]
     )
     uuid: UUID = Field(
         ...,
@@ -76,7 +83,10 @@ class WalletOperationResponse(BaseModel):
         ge=0,
         decimal_places=2,
         title="Wallet balance",
-        description="Current wallet balance after transaction, non-negative decimal with 2 decimal places",
+        description="""
+        Current wallet balance after transaction,
+        non-negative decimal with 2 decimal places
+        """,
         examples=[1500.00],
     )
 

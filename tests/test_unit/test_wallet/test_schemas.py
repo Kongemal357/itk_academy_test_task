@@ -1,26 +1,23 @@
 import uuid
-import pytest
-
 from decimal import Decimal
+
+import pytest
 from pydantic import ValidationError
 
 from src.api.v1.schemas.wallet import (
-    WalletOperationRequest,
     OperationType,
     WalletBalanceResponse,
-    WalletOperationResponse
+    WalletOperationRequest,
+    WalletOperationResponse,
 )
 
-
 # =============== WalletBalanceResponse ===============
+
 
 @pytest.mark.unit
 def test_balance_response_valid():
     random_uuid = uuid.uuid4()
-    request = WalletBalanceResponse(
-        uuid=random_uuid,
-        balance=Decimal("1000")
-    )
+    request = WalletBalanceResponse(uuid=random_uuid, balance=Decimal("1000"))
     assert request.uuid == random_uuid
     assert request.balance == Decimal("1000")
 
@@ -40,11 +37,11 @@ def test_balance_response_negative_balance():
 
 # =============== WalletOperationRequest ===============
 
+
 @pytest.mark.unit
 def test_operation_deposit_request_valid():
     request = WalletOperationRequest(
-        operation_type=OperationType.DEPOSIT,
-        amount=Decimal("1000")
+        operation_type=OperationType.DEPOSIT, amount=Decimal("1000")
     )
     assert request.operation_type == OperationType.DEPOSIT
     assert request.amount == Decimal("1000")
@@ -53,8 +50,7 @@ def test_operation_deposit_request_valid():
 @pytest.mark.unit
 def test_operation_withdraw_request_valid():
     request = WalletOperationRequest(
-        operation_type=OperationType.WITHDRAW,
-        amount=Decimal("1000")
+        operation_type=OperationType.WITHDRAW, amount=Decimal("1000")
     )
     assert request.operation_type == OperationType.WITHDRAW
     assert request.amount == Decimal("1000")
@@ -69,16 +65,21 @@ def test_operation_request_invalid_type():
 @pytest.mark.unit
 def test_operation_request_negative_amount():
     with pytest.raises(ValidationError):
-        WalletOperationRequest(operation_type=OperationType.DEPOSIT, amount=Decimal("-100"))
+        WalletOperationRequest(
+            operation_type=OperationType.DEPOSIT, amount=Decimal("-100")
+        )
 
 
 @pytest.mark.unit
 def test_operation_request_zero_amount():
     with pytest.raises(ValidationError):
-        WalletOperationRequest(operation_type=OperationType.DEPOSIT, amount=Decimal("0"))
+        WalletOperationRequest(
+            operation_type=OperationType.DEPOSIT, amount=Decimal("0")
+        )
 
 
 # =============== WalletOperationResponse ===============
+
 
 @pytest.mark.unit
 def test_operation_deposit_response_valid():
@@ -87,7 +88,7 @@ def test_operation_deposit_response_valid():
         operation_type=OperationType.DEPOSIT,
         amount=Decimal("100"),
         uuid=random_uuid,
-        balance=Decimal("1000")
+        balance=Decimal("1000"),
     )
     assert response.operation_type == OperationType.DEPOSIT
     assert response.amount == Decimal("100")
@@ -102,7 +103,7 @@ def test_operation_deposit_response_valid_zero_balance():
         operation_type=OperationType.DEPOSIT,
         amount=Decimal("100"),
         uuid=random_uuid,
-        balance=Decimal("0")
+        balance=Decimal("0"),
     )
     assert response.operation_type == OperationType.DEPOSIT
     assert response.amount == Decimal("100")
@@ -117,7 +118,7 @@ def test_operation_withdraw_response_valid():
         operation_type=OperationType.WITHDRAW,
         amount=Decimal("100"),
         uuid=random_uuid,
-        balance=Decimal("1000")
+        balance=Decimal("1000"),
     )
     assert response.operation_type == OperationType.WITHDRAW
     assert response.amount == Decimal("100")

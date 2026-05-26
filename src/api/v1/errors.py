@@ -4,8 +4,9 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
-from src.api.v1.schemas.error import ErrorResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from src.api.v1.schemas.error import ErrorResponse
 
 
 def add_exception_handlers(app: FastAPI):

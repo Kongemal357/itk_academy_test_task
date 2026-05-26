@@ -1,3 +1,4 @@
+import asyncio
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Path, HTTPException
@@ -153,7 +154,7 @@ async def post_wallet_transaction(
                 new_balance = wallet.balance - transaction.amount
 
         else:
-            raise HTTPException(status_code=400, detail="Invalid type operation")
+            raise HTTPException(status_code=500, detail="Invalid type operation")
 
         wallet.balance = new_balance
         await session.commit()
@@ -164,6 +165,10 @@ async def post_wallet_transaction(
             operation_type=transaction.operation_type,
             amount=transaction.amount,
         )
+
+    except asyncio.TimeoutError:
+        await session.rollback()
+        raise HTTPException(status_code=408, detail="Request timeout")
 
     except HTTPException:
         await session.rollback()

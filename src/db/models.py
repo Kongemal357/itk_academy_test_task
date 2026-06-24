@@ -3,8 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import UUID, CheckConstraint, DateTime, Numeric, func
-from sqlalchemy.orm import Mapped
-from sqlalchemy.testing.schema import mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
 from src.db.database import Base
 
